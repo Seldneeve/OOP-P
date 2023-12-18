@@ -1,0 +1,70 @@
+#include<iostream> 
+#include<string>
+using namespace std;
+
+
+struct Adres {
+    string street;
+    int num_H;
+    int num_F;
+};
+
+struct Gitel {
+    string fio;
+    Adres adr;
+    int pol;
+    int vozr;
+};
+
+int main() {
+    setlocale(0, "ru");
+    Gitel* pG;
+    cout << "Введите количество жителей: ";
+    int n;
+    cin >> n;
+    cin.ignore();
+    pG = new Gitel[n];
+
+    for (int i = 0; i < n; i++)
+    {
+        cout << "Житель " << i + 1 << endl;
+        cout << "Ф.И.О: ";
+        _flushall();
+        getline(cin, pG[i].fio);
+        cout << "Адрес: \n- Улица: ";
+        fflush(stdin);
+        getline(cin, pG[i].adr.street);
+        cout << "- Номер дома: ";
+        cin >> pG[i].adr.num_H;
+        cout << "- Номер квартиры: ";
+        cin >> pG[i].adr.num_F;
+        cout << "Пол(1 - мужской, 0 - женский): ";
+        fflush(stdin);
+        cin >> pG[i].pol;
+        cout << "Возраст: ";
+        cin >> pG[i].vozr;
+        cin.ignore();
+        cout << "\n";
+    }
+    string StreetName;
+    int hid;
+    cout << "\nНазвание улицы: ";
+    fflush(stdin);
+    getline(cin, StreetName);
+    cout << "\nНомер дома: ";
+    fflush(stdin);
+    cin >> hid;
+    int m = 0, f = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (StreetName == pG[i].adr.street && pG[i].adr.num_H == hid) {
+            if (pG[i].pol == 0) f++;
+            else if (pG[i].pol == 1) m++;
+        }
+    }
+    if (m + f) {
+        cout << "Найдено " << m << " мужчин и " << f << " женщин.";
+    }
+    else cout << "Никого не найдено.";
+    return 0;
+}

@@ -1,0 +1,232 @@
+#include <iostream>
+#include <initializer_list>
+#include <stdexcept>
+#include <string>
+
+namespace containers {
+
+    template <typename Key, typename Value>
+    class Map {
+    private:
+        struct Node {
+            Key key;
+            Value value;
+            Node* left;
+            Node* right;
+
+            Node(const Key& k, const Value& v) : key(k), value(v), left(nullptr), right(nullptr) {}
+        };
+
+        Node* root;
+
+        Node* insert(Node* node, const Key& key, const Value& value) {
+            if (node == nullptr) {
+                return new Node(key, value);
+            }
+
+            if (key < node->key) {
+                node->left = insert(node->left, key, value);
+            }
+            else if (key > node->key) {
+                node->right = insert(node->right, key, value);
+            }
+            else {
+                throw std::invalid_argument("Duplicate key");
+            }
+
+            return node;
+        }
+
+        Node* findMin(Node* node) {
+            if (node == nullptr) {
+                return nullptr;
+            }
+
+            while (node->left != nullptr) {
+                node = node->left;
+            }
+
+            return node;
+        }
+
+        Node* remove(Node* node, const Key& key) {
+            if (node == nullptr) {
+                return nullptr;
+            }
+
+            if (key < node->key) {
+                node->left = remove(node->left, key);
+            }
+            else if (key > node->key) {
+                node->right = remove(node->right, key);
+            }
+            else {
+                if (node->left == nullptr) {
+                    Node* temp = node->right;
+                    delete node;
+                    return temp;
+                }
+                else if (node->right == nullptr) {
+                    Node* temp = node->left;
+                    delete node;
+                    return temp;
+                }
+
+                Node* temp = findMin(node->right);
+                node->key = temp->key;
+                node->value = temp->value;
+                node->right = remove(node->right, temp->key);
+            }
+
+            return node;
+        }
+
+    public:
+        Map() : root(nullptr) {}
+
+        Map(std::initializer_list<std::pair<Key, Value>> list) : root(nullptr) {
+            for (const auto& pair : list) {
+                insert(pair.first, pair.second);
+            }
+        }
+
+        Map(const Map& other) : root(nullptr) {
+            *this = other;
+        }
+
+        Map& operator=(const Map& other) {
+            if (this != &other) {
+                clear();
+                copyTree(root, other.root);
+            }
+            return *this;
+        }
+
+        ~Map() {
+            clear();
+        }
+
+        void insert(const Key& key, const Value& value) {
+            root = insert(root, key, value);
+        }
+
+        void remove(const Key& key) {
+            root = remove(root, key);
+        }
+
+        Value& operator[](const Key& key) {
+            Node* node = root;
+            while (node != nullptr) {
+                if (key < node->key) {
+                    node = node->left;
+                }
+                else if (key > node->key) {
+                    node = node->right;
+                }
+                else {
+                    return node->value;
+                }
+            }
+            throw std::out_of_range("Key not found");
+        }
+
+        bool contains(const Key& key) const {
+            Node* node = root;
+            while (node != nullptr) {
+                if (key < node->key) {
+                    node = node->left;
+                }
+                else if (key > node->key) {
+                    node = node->right;
+                }
+                else {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void clear() {
+            while (root != nullptr) {
+                remove(root->key);
+            }
+        }
+
+        void printInOrder(Node* node) {
+            if (node != nullptr) {
+                printInOrder(node->left);
+                std::cout << node->key << ": " << node->value << std::endl;
+                printInOrder(node->right);
+            }
+        }
+
+        void print() {
+            printInOrder(root);
+        }
+    };
+
+}  // namespace containers
+
+int main() {
+    setlocale(0, "ru");
+    containers::Map<int, std::string> intToStringMap;
+    containers::Map<double, std::string> doubleToStringMap;
+    containers::Map<std::string, int> stringToIntMap;
+
+    int choice;
+    do {
+        std::cout << "Меню:" << std::endl;
+        std::cout << "1. Вставить элемент" << std::endl;
+        std::cout << "2. Удалить элемент" << std::endl;
+        std::cout << "3. Проверить наличие ключа" << std::endl;
+        std::cout << "4. Вывести содержимое" << std::endl;
+        std::cout << "5. Выйти" << std::endl;
+        std::cout << "Введите ваш выбор: ";
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            int key;
+            std::string value;
+            std::cout << "Введите ключ и значение для вставки: ";
+            std::cin >> key >> value;
+            intToStringMap.insert(key, value);
+            break;
+        }
+        case 2: {
+            int key;
+            std::cout << "Введите ключ для удаления: ";
+            std::cin >> key;
+            intToStringMap.remove(key);
+            break;
+        }
+        case 3: {
+            int key;
+            std::cout << "Введите ключ для проверки наличия: ";
+            std::cin >> key;
+            if (intToStringMap.contains(key)) {
+                std::cout << "Ключ существует в словаре." << std::endl;
+            }
+            else {
+                std::cout << "Ключ не существует в словаре." << std::endl;
+            }
+            break;
+        }
+        case 4:
+            std::cout << "Словарь (int -> string):" << std::endl;
+            intToStringMap.print();
+            std::cout << "\nСловарь (double -> string):" << std::endl;
+            doubleToStringMap.print();
+            std::cout << "\nСловарь (string -> int):" << std::endl;
+            stringToIntMap.print();
+            break;
+        case 5:
+            std::cout << "Выход из программы." << std::endl;
+            break;
+        default:
+            std::cout << "Неверный выбор. Попробуйте снова." << std::endl;
+        }
+    } while (choice != 5);
+
+    return 0;
+}

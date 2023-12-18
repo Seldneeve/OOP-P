@@ -1,0 +1,155 @@
+#include <iostream>
+#include <string>
+
+template <typename T>
+class UPtr {
+private:
+    T* ptr;
+
+public:
+    UPtr() : ptr(nullptr) {}
+
+    explicit UPtr(T* p) : ptr(p) {}
+
+    ~UPtr() {
+        delete ptr;
+    }
+
+    UPtr(const UPtr&) = delete;
+    UPtr& operator=(const UPtr&) = delete;
+
+    UPtr(UPtr&& other) noexcept {
+        ptr = other.ptr;
+        other.ptr = nullptr;
+    }
+
+    UPtr& operator=(UPtr&& other) noexcept {
+        if (this != &other) {
+            delete ptr;
+            ptr = other.ptr;
+            other.ptr = nullptr;
+        }
+        return *this;
+    }
+
+    T* get() const {
+        return ptr;
+    }
+
+    T& operator*() const {
+        return *ptr;
+    }
+
+    T* operator->() const {
+        return ptr;
+    }
+
+    void reset() {
+        delete ptr;
+        ptr = nullptr;
+    }
+
+    void swap(UPtr& other) {
+        if (this != &other && dynamic_cast<UPtr<T>*>(&other)) {
+            std::swap(ptr, other.ptr);
+        }
+    }
+};
+
+int main() {
+    setlocale(0, "ru");
+    UPtr<int> intPtr;
+    UPtr<int> newPtr;
+    UPtr<double> doublePtr;
+    UPtr<std::string> strPtr;
+
+    int choice;
+
+    do {
+        std::cout << "Меню:" << std::endl;
+        std::cout << "1. Создать и присвоить intPtr" << std::endl;
+        std::cout << "2. Создать и присвоить doublePtr" << std::endl;
+        std::cout << "3. Создать и присвоить strPtr" << std::endl;
+        std::cout << "4. Отобразить значения и методы" << std::endl;
+        std::cout << "5. Сбросить указатели" << std::endl;
+        std::cout << "6. Обменять указателями intPtr" << std::endl;
+        std::cout << "7. Выход" << std::endl;
+
+        std::cout << "Введите ваш выбор: ";
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            intPtr.reset();
+            int val;
+            std::cout << "Введите целочисленное значение: ";
+            std::cin >> val;
+            intPtr = UPtr<int>(new int(val));
+            break;
+        }
+        case 2: {
+            doublePtr.reset();
+            double val;
+            std::cout << "Введите значение с плавающей точкой: ";
+            std::cin >> val;
+            doublePtr = UPtr<double>(new double(val));
+            break;
+        }
+        case 3: {
+            strPtr.reset();
+            std::string val;
+            std::cout << "Введите строковое значение: ";
+            std::cin >> val;
+            strPtr = UPtr<std::string>(new std::string(val));
+            break;
+        }
+        case 4: {
+            std::cout << "Значения и методы:" << std::endl;
+            if (intPtr.get())
+                std::cout << "intPtr: " << *intPtr << std::endl;
+            else
+                std::cout << "intPtr не инициализирован." << std::endl;
+
+            if (doublePtr.get())
+                std::cout << "doublePtr: " << *doublePtr << std::endl;
+            else
+                std::cout << "doublePtr не инициализирован." << std::endl;
+
+            if (strPtr.get())
+                std::cout << "strPtr: " << *strPtr << std::endl;
+            else
+                std::cout << "strPtr не инициализирован." << std::endl;
+
+            std::cout << "Методы:" << std::endl;
+            std::cout << "intPtr.get() = " << static_cast<void*>(intPtr.get()) << std::endl;
+            std::cout << "doublePtr.get() = " << static_cast<void*>(doublePtr.get()) << std::endl;
+            std::cout << "strPtr.get() = " << static_cast<void*>(strPtr.get()) << std::endl;
+            break;
+        }
+        case 5: {
+            intPtr.reset();
+            doublePtr.reset();
+            strPtr.reset();
+            std::cout << "Указатели сброшены." << std::endl;
+            break;
+        }
+        case 6: {
+
+            intPtr.swap(newPtr);
+            std::cout << "Указатели intPtr и newPtr обменялись." << std::endl;
+            std::cout << "newPtr: " << *newPtr << std::endl;
+            break;
+        }
+        case 7: {
+            // Выход из программы
+            break;
+        }
+        default: {
+            std::cout << "Неверный выбор. Пожалуйста, попробуйте снова." << std::endl;
+            break;
+        }
+        }
+    } while (choice != 7);
+
+    return 0;
+}

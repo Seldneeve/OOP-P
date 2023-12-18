@@ -1,0 +1,69 @@
+#include <iostream>
+#include <cmath>
+#include <stdexcept>
+
+// Определение класса CustomException
+class CustomException : public std::exception {
+private:
+    std::string message;
+    double value;
+    std::string code;
+
+public:
+    CustomException(std::string msg, double val, std::string err_code)
+        : message(msg), value(val), code(err_code) {}
+
+    // Перегрузка функции what()
+    const char* what() const throw () {
+        return message.c_str();
+    }
+
+    double getValue() const { return value; }
+    std::string getCode() const { return code; }
+};
+
+// Функция для вычисления Z1
+double calculate_z1(double& x) {
+    if (x <= 0) {
+        throw CustomException("Invalid value for x in Z1", x, "INVALID_X");
+    }
+
+    double numerator = std::sqrt(2 * std::sqrt(x * x - 4 + 2 * x));
+    double denominator = x + std::sqrt(x * x - 4 + 2 * x);
+
+    if (denominator == 0) {
+        throw CustomException("Division by zero in Z1", denominator, "ZERO_DIVISION");
+    }
+
+    return numerator / denominator;
+}
+
+// Функция для вычисления Z2
+double calculate_z2(double& x) {
+    if (x == -2) {
+        throw CustomException("Division by zero in Z2", x, "ZERO_DIVISION");
+    }
+    return 1 / std::sqrt(x + 2);
+}
+
+int main() {
+    setlocale(0, "ru");
+    double x;
+    std::cout << "Введите значение x: ";
+    std::cin >> x;
+
+    try {
+        double z1 = calculate_z1(x);
+        double z2 = calculate_z2(x);
+
+        std::cout << "Z1 = " << z1 << std::endl;
+        std::cout << "Z2 = " << z2 << std::endl;
+    }
+    catch (const CustomException& e) {
+        std::cerr << "Ошибка: " << e.what()
+            << "\nЗначение, приведшее к ошибке: " << e.getValue()
+            << "\nКод ошибки: " << e.getCode() << std::endl;
+    }
+
+    return 0;
+}

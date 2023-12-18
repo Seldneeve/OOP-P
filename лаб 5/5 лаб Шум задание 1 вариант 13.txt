@@ -1,0 +1,30 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+
+int main() {
+    const int arraySize = 256;
+    int numbers[arraySize];
+
+    // Инициализация генератора случайных чисел
+    std::srand(static_cast<int>(std::time(nullptr)));
+
+    // Заполняем массив случайными числами от 1 до 1000
+    for (int i = 0; i < arraySize; ++i) {
+        numbers[i] = std::rand() % 1000 + 1;
+    }
+
+    // Вывод чисел в различных системах счисления
+    for (int i = 0; i < arraySize; ++i) {
+        std::cout << std::dec << std::setw(5) << numbers[i] << " "; // DEC формат
+        std::cout << std::hex << std::setw(4) << numbers[i] << " "; // HEX формат
+        std::cout << std::oct << std::setw(6) << numbers[i] << " "; // OCT формат
+
+        if ((i + 1) % 4 == 0) {
+            std::cout << std::endl;
+        }
+    }
+
+    return 0;
+}

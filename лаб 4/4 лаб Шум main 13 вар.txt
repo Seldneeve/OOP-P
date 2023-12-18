@@ -1,0 +1,79 @@
+#include <iostream>
+#include "deque.h"
+
+int main() {
+    setlocale(0, "ru");
+    Deque<int> deque;
+
+    int choice;
+    do {
+        std::cout << "Меню Дека:" << std::endl;
+        std::cout << "1. Добавить в начало" << std::endl;
+        std::cout << "2. Добавить в конец" << std::endl;
+        std::cout << "3. Удалить из начала" << std::endl;
+        std::cout << "4. Удалить из конца" << std::endl;
+        std::cout << "5. Первый элемент" << std::endl;
+        std::cout << "6. Последний элемент" << std::endl;
+        std::cout << "7. Размер" << std::endl;
+        std::cout << "8. Пуст ли?" << std::endl;
+        std::cout << "9. Вывести на экран" << std::endl;
+        std::cout << "0. Выход" << std::endl;
+        std::cout << "Введите ваш выбор: ";
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            int value;
+            std::cout << "Введите значение для добавления в начало: ";
+            std::cin >> value;
+            deque.push_front(value);
+            break;
+        }
+        case 2: {
+            int value;
+            std::cout << "Введите значение для добавления в конец: ";
+            std::cin >> value;
+            deque.push_back(value);
+            break;
+        }
+        case 3:
+            deque.pop_front();
+            break;
+        case 4:
+            deque.pop_back();
+            break;
+        case 5:
+            if (!deque.empty())
+                std::cout << "Первый элемент: " << deque.front() << std::endl;
+            else
+                std::cout << "Дек пуст" << std::endl;
+            break;
+        case 6:
+            if (!deque.empty())
+                std::cout << "Последний элемент: " << deque.back() << std::endl;
+            else
+                std::cout << "Дек пуст" << std::endl;
+            break;
+        case 7:
+            std::cout << "Размер дека: " << deque.size() << std::endl;
+            break;
+        case 8:
+            if (deque.empty())
+                std::cout << "Дек пуст" << std::endl;
+            else
+                std::cout << "Дек не пуст" << std::endl;
+            break;
+        case 9:
+            std::cout << "Элементы дека: ";
+            deque.display();
+            break;
+        case 0:
+            std::cout << "Выход из программы" << std::endl;
+            break;
+        default:
+            std::cout << "Неправильный выбор, пожалуйста, повторите попытку" << std::endl;
+        }
+    } while (choice != 0);
+
+    return 0;
+}

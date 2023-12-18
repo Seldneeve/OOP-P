@@ -1,0 +1,100 @@
+// deque.h - заголовочный файл для целевого класса Deque
+#ifndef DEQUE_H
+#define DEQUE_H
+
+#include <initializer_list>
+#include "list.h" // Включаем серверный класс List
+
+template <typename T>
+class Deque {
+public:
+    List<T> list; // Используем серверный класс List для хранения элементов
+
+    // Конструктор по умолчанию
+    Deque() {}
+
+    // Конструктор от std::initializer_list<T>
+    Deque(std::initializer_list<T> initList) {
+        for (const T& item : initList) {
+            list.push_back(item);
+        }
+    }
+
+    // Конструктор копирования
+    Deque(const Deque& other) {
+        list = other.list;
+    }
+
+    // Оператор присваивания
+    Deque& operator=(const Deque& other) {
+        if (this != &other) {
+            list = other.list;
+        }
+        return *this;
+    }
+
+    // Конструктор перемещения
+    Deque(Deque&& other) noexcept {
+        list = std::move(other.list);
+    }
+
+    // Оператор перемещения
+    Deque& operator=(Deque&& other) noexcept {
+        if (this != &other) {
+            list = std::move(other.list);
+        }
+        return *this;
+    }
+
+    // Добавление элемента в начало очереди
+    void push_front(const T& value) {
+        list.push_front(value);
+    }
+
+    // Добавление элемента в конец очереди
+    void push_back(const T& value) {
+        list.push_back(value);
+    }
+
+    // Удаление элемента из начала очереди
+    void pop_front() {
+        list.pop_front();
+    }
+
+    // Удаление элемента из конца очереди
+    void pop_back() {
+        list.pop_back();
+    }
+
+    // Получение ссылки на первый элемент очереди
+    T& front() {
+        return list.front();
+    }
+
+    // Получение ссылки на последний элемент очереди
+    T& back() {
+        return list.back();
+    }
+
+    // Проверка, пуста ли очередь
+    bool empty() const {
+        return list.empty();
+    }
+
+    // Получение размера очереди
+    size_t size() const {
+        return list.size();
+    }
+
+    // Вывод содержимого очереди
+    void display() const {
+        auto current = list.head;
+        while (current) {
+            std::cout << current->value << " ";
+            current = current->next;
+        }
+        std::cout << std::endl;
+    }
+};
+
+#endif // DEQUE_H
